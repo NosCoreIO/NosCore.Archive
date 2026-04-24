@@ -1,0 +1,61 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  create:
+    tags:
+      - '*.*.*'
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.0'
+      continue-on-error: true
+    - name: Fallback - Install .NET 10 manually
+      if: failure()
+      run: |
+        wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+        chmod +x dotnet-install.sh
+        ./dotnet-install.sh --channel 10.0 --install-dir $HOME/.dotnet
+        echo "$HOME/.dotnet" >> $GITHUB_PATH
+
+    - name: Check Tag
+      id: check-tag
+      run: |
+        if [[ v${{ github.event.ref }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "match=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run Unit Tests
+      run: |
+        dotnet restore
+        dotnet build
+        dotnet test --no-build --filter TestCategory!=OPTIONAL-TEST
+
+    - name: Build Artifact
+      if: steps.check-tag.outputs.match == 'true'
+      id: build_artifact
+      run: |
+        dotnet restore
+        dotnet build -c Release
+        dotnet pack -c Release -o /tmp/nupkgs -v m -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+        dotnet nuget push /tmp/nupkgs/NosCore.Archive.${{github.event.ref}}.nupkg -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}}
+        echo "ARTIFACT_PATH=/tmp/nupkgs/NosCore.Archive.${{github.event.ref}}.nupkg" >> $GITHUB_OUTPUT
+        echo "ARTIFACT_NAME=NosCore.Archive.${{github.event.ref}}.nupkg" >> $GITHUB_OUTPUT
+
+    - name: Upload Release Asset
+      if: steps.check-tag.outputs.match == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.build_artifact.outputs.ARTIFACT_PATH }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
