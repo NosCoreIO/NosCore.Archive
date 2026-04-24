@@ -46,3 +46,8 @@ repeat fileCount times:
 ```
 
 The inner payload is XOR-obfuscated. `NosArchive.Write` emits the simple `0x33`-XOR mode; `NosArchive.Read` handles both that and the packed-nibble mode produced by the real client.
+
+## You like our work? ##
+<a href='https://github.com/sponsors/0Lucifer0' target='_blank'><img height='48' style='border:0px;height:46px;' src='https://i.gyazo.com/47b2ca2eb6e1ce38d02b04c410e1c82a.png' border='0' alt='Sponsor me!' /></a>
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A3562BQV)
+<a href='https://www.patreon.com/bePatron?u=6503887' target='_blank'><img height='46' style='border:0px;height:46px;' src='https://c5.patreon.com/external/logo/become_a_patron_button@2x.png' border='0' alt='Become a Patron!' /></a>
