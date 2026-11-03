@@ -98,6 +98,25 @@ namespace NosCore.Archive.Tests
         }
 
         [TestMethod]
+        public void ACountLargerThanTheTableIsRejected()
+        {
+            var bytes = Build();
+            System.BitConverter.GetBytes(int.MaxValue).CopyTo(bytes, 16);
+
+            Assert.ThrowsExactly<InvalidDataException>(() => NtDataArchive.Read(bytes));
+        }
+
+        [TestMethod]
+        public void AnEntryLargerThanItsDeclaredSizeIsRejected()
+        {
+            var bytes = Build((1, new byte[100]));
+            var offset = System.BitConverter.ToInt32(bytes, 25);
+            System.BitConverter.GetBytes(10).CopyTo(bytes, offset + 4);
+
+            Assert.ThrowsExactly<InvalidDataException>(() => NtDataArchive.Read(bytes));
+        }
+
+        [TestMethod]
         public void ALegacyArchiveIsRejected()
         {
             Assert.ThrowsExactly<InvalidDataException>(() => NtDataArchive.Read(NosArchive.Write([])));
