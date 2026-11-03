@@ -13,8 +13,8 @@ namespace NosCore.Archive
 {
     /// <summary>
     /// Read/write support for the legacy NosTale <c>.NOS</c> archive format used
-    /// by <c>NScliData_*.NOS</c> and friends. The newer "NT Data" DEFLATE variant
-    /// is not supported.
+    /// by <c>NScliData_*.NOS</c> and friends. The newer "NT Data" variant is read by
+    /// <see cref="NtDataArchive"/>.
     ///
     /// Layout: <c>int32 fileCount</c>, then per entry
     /// <c>int32 id; int32 nameLen; byte[nameLen] name; int32 unknown; int32 encLen; byte[encLen] enc</c>.
