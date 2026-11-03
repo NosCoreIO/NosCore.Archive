@@ -16,7 +16,9 @@ namespace NosCore.Archive.Tests
     [TestClass]
     public class NtDataArchiveTests
     {
-        private static byte[] Build(params (int Id, byte[] Content)[] files)
+        private static byte[] Build(params (int Id, byte[] Content)[] files) => Build(true, files);
+
+        private static byte[] Build(bool compress, params (int Id, byte[] Content)[] files)
         {
             using var ms = new MemoryStream();
             using var w = new BinaryWriter(ms);
@@ -36,12 +38,13 @@ namespace NosCore.Archive.Tests
                     zlib.Write(content);
                 }
 
+                var stored = compress ? compressed.ToArray() : content;
                 offsets.Add((int)ms.Position);
                 w.Write(0);
                 w.Write(content.Length);
-                w.Write((int)compressed.Length);
-                w.Write((byte)1);
-                w.Write(compressed.ToArray());
+                w.Write(stored.Length);
+                w.Write((byte)(compress ? 1 : 0));
+                w.Write(stored);
             }
 
             ms.Position = tableStart;
@@ -67,6 +70,18 @@ namespace NosCore.Archive.Tests
             CollectionAssert.AreEqual(first, entries[0].Content);
             Assert.AreEqual(3, entries[1].Id);
             CollectionAssert.AreEqual(second, entries[1].Content);
+        }
+
+        [TestMethod]
+        public void UncompressedEntriesAreReadAsStored()
+        {
+            var content = Encoding.ASCII.GetBytes("stored as is");
+
+            var entries = NtDataArchive.Read(Build(false, (0, content), (1, content)));
+
+            Assert.AreEqual(2, entries.Count);
+            CollectionAssert.AreEqual(content, entries[0].Content);
+            CollectionAssert.AreEqual(content, entries[1].Content);
         }
 
         [TestMethod]

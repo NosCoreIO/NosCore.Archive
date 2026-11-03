@@ -13,11 +13,12 @@ using System.Text;
 namespace NosCore.Archive
 {
     /// <summary>
-    /// Read support for the "NT Data" <c>.NOS</c> archive format, whose entries are zlib-compressed.
+    /// Read support for the "NT Data" <c>.NOS</c> archive format, whose entries are usually zlib-compressed.
     ///
     /// Layout: <c>"NT Data"</c> magic padded to 16 bytes, <c>int32 fileCount</c>, one byte, then per entry
     /// <c>int32 id; int32 offset</c>. At each offset: <c>int32 unknown; int32 size; int32 compressedSize;
-    /// byte flag; byte[compressedSize] zlib data</c>.
+    /// byte isCompressed; byte[compressedSize] data</c>, zlib-compressed unless
+    /// <c>isCompressed</c> is 0, in which case the <c>size</c> bytes are stored as they are.
     /// </summary>
     public static class NtDataArchive
     {
@@ -54,8 +55,16 @@ namespace NosCore.Archive
                 var row = TableOffset + i * 8;
                 var id = BitConverter.ToInt32(bytes, row);
                 var offset = BitConverter.ToInt32(bytes, row + 4);
+                var size = BitConverter.ToInt32(bytes, offset + 4);
                 var compressedSize = BitConverter.ToInt32(bytes, offset + 8);
+                var isCompressed = bytes[offset + 12] != 0;
                 var data = offset + 13;
+
+                if (!isCompressed)
+                {
+                    result.Add(new Entry(id, bytes.AsSpan(data, size).ToArray()));
+                    continue;
+                }
 
                 using var compressed = new MemoryStream(bytes, data, Math.Min(compressedSize, bytes.Length - data));
                 using var zlib = new ZLibStream(compressed, CompressionMode.Decompress);
