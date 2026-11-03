@@ -11,7 +11,7 @@
 		<RepositoryUrl>https://github.com/NosCoreIO/NosCore.Archive.git</RepositoryUrl>
 		<PackageIconUrl></PackageIconUrl>
 		<PackageTags>nostale, noscore, nos archive, nostale private server source, nostale emulator</PackageTags>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Description>Read/write support for the legacy NosTale .NOS archive format (e.g. NScliData_*.NOS).</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
