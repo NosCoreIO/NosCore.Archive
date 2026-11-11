@@ -16,17 +16,17 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v7
-    - name: Setup .NET 10
+    - name: Setup .NET 11
       uses: actions/setup-dotnet@v6
       with:
         dotnet-version: '11.0.x'
       continue-on-error: true
-    - name: Fallback - Install .NET 10 manually
+    - name: Fallback - Install .NET 11 manually
       if: failure()
       run: |
         wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
         chmod +x dotnet-install.sh
-        ./dotnet-install.sh --channel 10.0 --install-dir $HOME/.dotnet
+        ./dotnet-install.sh --channel 11.0 --install-dir $HOME/.dotnet
         echo "$HOME/.dotnet" >> $GITHUB_PATH
 
     - name: Check Tag
