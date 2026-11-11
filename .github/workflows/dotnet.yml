@@ -55,7 +55,7 @@ jobs:
       run: |
         dotnet restore
         dotnet build -c Release
-        dotnet pack -c Release -o /tmp/nupkgs -v m -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+        dotnet pack -c Release -o /tmp/nupkgs -v m -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:PackageVersion=${{github.event.ref}}
         dotnet nuget push /tmp/nupkgs/NosCore.Archive.${{github.event.ref}}.nupkg -s https://api.nuget.org/v3/index.json -k ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         echo "ARTIFACT_PATH=/tmp/nupkgs/NosCore.Archive.${{github.event.ref}}.nupkg" >> $GITHUB_OUTPUT
         echo "ARTIFACT_NAME=NosCore.Archive.${{github.event.ref}}.nupkg" >> $GITHUB_OUTPUT
