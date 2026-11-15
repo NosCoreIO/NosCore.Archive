@@ -12,8 +12,8 @@
 </p>
 
 Reads and writes the NosTale `.NOS` archives (`NScliData_*.NOS`, `NSlangData_*.NOS` and the like) that hold the
-client's data files, such as `conststring.dat` and `item.dat`. Only the legacy layout is supported, not the newer
-DEFLATE-based "NT Data" variant.
+client's data files, such as `conststring.dat` and `item.dat`. `NosArchive` reads and writes the legacy layout;
+`NtDataArchive` reads the newer DEFLATE-based "NT Data" variant but cannot write it.
 
 ## Install
 
